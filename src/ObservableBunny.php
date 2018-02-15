@@ -8,7 +8,9 @@ use Bunny\Message as BunnyMessage;
 use Bunny\Protocol\MethodBasicConsumeOkFrame;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
+use React\Promise\PromiseInterface;
 use Rx\Subject\Subject;
+use Throwable;
 
 final class ObservableBunny
 {
@@ -57,7 +59,7 @@ final class ObservableBunny
                     $timer,
                     $channel,
                     $consumerTag
-                )->done([$subject, 'onComplete'], [$subject, 'onError']);
+                )->done([$subject, 'onComplete'], $this->onError($subject, $timer));
             });
             $channel->consume(
                 function (BunnyMessage $message, Channel $channel) use ($subject, &$timer, &$consumerTag) {
@@ -67,7 +69,7 @@ final class ObservableBunny
                             $timer,
                             $channel,
                             $consumerTag
-                        )->done([$subject, 'onComplete'], [$subject, 'onError']);
+                        )->done([$subject, 'onComplete'], $this->onError($subject, $timer));
 
                         return;
                     }
@@ -77,18 +79,28 @@ final class ObservableBunny
                 ...$consumeArgs
             )->then(function (MethodBasicConsumeOkFrame $response) use (&$consumerTag) {
                 $consumerTag = $response->consumerTag;
-            })->done(null, [$subject, 'onError']);
+            })->done(null, $this->onError($subject, $timer));
         })->done(null, [$subject, 'onError']);
 
         return $subject;
     }
 
-    private function cancelSubscription(TimerInterface $timer, Channel $channel, string $consumerTag)
+    private function cancelSubscription(TimerInterface $timer, Channel $channel, string $consumerTag): PromiseInterface
     {
         $this->loop->cancelTimer($timer);
 
         return $channel->cancel($consumerTag)->then(function () use ($channel) {
             return $channel->close();
         });
+    }
+
+    private function onError(Subject $subject, TimerInterface $timer): callable
+    {
+        return function (Throwable $et) use ($subject, $timer) {
+            if ($this->loop->isTimerActive($timer)) {
+                $this->loop->cancelTimer($timer);
+            }
+            $subject->onError($et);
+        };
     }
 }
