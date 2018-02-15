@@ -10,9 +10,9 @@ use Bunny\Protocol\MethodBasicConsumeOkFrame;
 use Exception;
 use Prophecy\Argument;
 use React\EventLoop\Factory;
-use function React\Promise\reject;
 use WyriHaximus\React\ObservableBunny\Message;
 use WyriHaximus\React\ObservableBunny\ObservableBunny;
+use function React\Promise\reject;
 use function React\Promise\resolve;
 
 final class ObservableBunnyTest extends TestCase
