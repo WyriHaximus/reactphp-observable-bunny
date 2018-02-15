@@ -90,7 +90,29 @@ final class ObservableBunnyTest extends TestCase
         $subject = $observableBunny->consume('queue:name');
 
         $errorDot = null;
-        $subject->subscribe(null, function (Exception $error) use (&$errorDot, $subject) {
+        $subject->subscribe(null, function (Exception $error) use (&$errorDot) {
+            $errorDot = $error;
+        });
+
+        $loop->run();
+
+        self::assertSame($error, $errorDot);
+    }
+
+    public function testChannelError()
+    {
+        $error = new Exception('channel:error');
+
+        $loop = Factory::create();
+
+        $bunny = $this->prophesize(Client::class);
+        $bunny->channel()->shouldBeCalled()->willReturn(reject($error));
+
+        $observableBunny = new ObservableBunny($loop, $bunny->reveal());
+        $subject = $observableBunny->consume('queue:name');
+
+        $errorDot = null;
+        $subject->subscribe(null, function (Exception $error) use (&$errorDot) {
             $errorDot = $error;
         });
 
