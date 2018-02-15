@@ -7,6 +7,7 @@ use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Bunny\Protocol\MethodBasicConsumeOkFrame;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use Rx\Subject\Subject;
 
 final class ObservableBunny
@@ -45,21 +46,28 @@ final class ObservableBunny
 
         $channel = $this->bunny->channel();
         $channel->then(function (Channel $channel) use ($subject, $consumeArgs) {
+            /** @var string $consumerTag */
             $consumerTag = null;
             $timer = $this->loop->addPeriodicTimer(1, function () use ($channel, $subject, &$timer, &$consumerTag) {
                 if (!$subject->isDisposed()) {
                     return;
                 }
 
-                $channel->cancel($consumerTag)->done([$subject, 'onComplete'], [$subject, 'onError']);
-                $this->loop->cancelTimer($timer);
+                $this->cancelSubscription(
+                    $timer,
+                    $channel,
+                    $consumerTag
+                )->done([$subject, 'onComplete'], [$subject, 'onError']);
             });
             $channel->consume(
                 function (BunnyMessage $message, Channel $channel) use ($subject, &$timer, &$consumerTag) {
                     if ($subject->isDisposed()) {
                         $channel->nack($message);
-                        $channel->cancel($consumerTag)->done([$subject, 'onComplete'], [$subject, 'onError']);
-                        $this->loop->cancelTimer($timer);
+                        $this->cancelSubscription(
+                            $timer,
+                            $channel,
+                            $consumerTag
+                        )->done([$subject, 'onComplete'], [$subject, 'onError']);
 
                         return;
                     }
@@ -73,5 +81,14 @@ final class ObservableBunny
         })->done(null, [$subject, 'onError']);
 
         return $subject;
+    }
+
+    private function cancelSubscription(TimerInterface $timer, Channel $channel, string $consumerTag)
+    {
+        $this->loop->cancelTimer($timer);
+
+        return $channel->cancel($consumerTag)->then(function () use ($channel) {
+            return $channel->close();
+        });
     }
 }

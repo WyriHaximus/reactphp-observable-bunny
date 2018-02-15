@@ -25,6 +25,7 @@ final class ObservableBunnyTest extends TestCase
         $loop = Factory::create();
 
         $channel = $this->prophesize(Channel::class);
+        $channel->close()->shouldBeCalled()->willReturn(resolve(true));
         $channel->cancel('abc')->shouldBeCalled()->willReturn(resolve(true));
         $channel->consume(
             Argument::that(function ($lambda) use ($message, $channel, $loop) {
