@@ -63,6 +63,45 @@ final class ObservableBunnyTest extends TestCase
         self::assertSame($message, $messageDto->getMessage());
     }
 
+    public function testConsumeDisposeAfterFirstMessage()
+    {
+        $message = new BunnyMessage('abc', 'xyz', false, '', 'beer', [], 'foo.bar');
+
+        $methodBasicConsumeOkFrame = new MethodBasicConsumeOkFrame();
+        $methodBasicConsumeOkFrame->consumerTag = 'abc';
+
+        $loop = Factory::create();
+
+        $channel = $this->prophesize(Channel::class);
+        $channel->nack($message)->shouldBeCalled()->willReturn(resolve(true));
+        $channel->close()->shouldBeCalled()->willReturn(resolve(true));
+        $channel->cancel('abc')->shouldBeCalled()->willReturn(resolve(true));
+        $channel->consume(
+            Argument::that(function ($lambda) use ($message, $channel, $loop) {
+                $loop->futureTick(function () use ($lambda, $message, $channel) {
+                    $lambda($message, $channel->reveal());
+                });
+
+                return true;
+            }),
+            'queue:name',
+            '',
+            false,
+            false,
+            false,
+            false,
+            []
+        )->shouldBeCalled()->willReturn(resolve($methodBasicConsumeOkFrame));
+
+        $bunny = $this->prophesize(Client::class);
+        $bunny->channel()->shouldBeCalled()->willReturn(resolve($channel->reveal()));
+
+        $observableBunny = new ObservableBunny($loop, $bunny->reveal());
+        $observableBunny->consume('queue:name')->dispose();
+
+        $loop->run();
+    }
+
     public function testConsumeError()
     {
         $error = new Exception('consume:error');
