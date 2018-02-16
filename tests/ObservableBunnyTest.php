@@ -55,8 +55,9 @@ final class ObservableBunnyTest extends TestCase
         $messageDto = null;
         $subject->subscribe(function (Message $message) use (&$messageDto, $subject) {
             $messageDto = $message;
-            $subject->dispose();
         });
+
+        $loop->addTimer(2, [$subject, 'dispose']);
 
         $loop->run();
 
