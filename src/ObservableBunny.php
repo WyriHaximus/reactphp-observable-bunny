@@ -36,6 +36,7 @@ final class ObservableBunny
 
     public function consume(
         string $queue = '',
+        array $qos = [],
         string $consumerTag = '',
         bool $noLocal = false,
         bool $noAck = false,
@@ -47,7 +48,15 @@ final class ObservableBunny
         $consumeArgs = [$queue, $consumerTag, $noLocal, $noAck, $exclusive, $nowait, $arguments];
 
         $channel = $this->bunny->channel();
-        $channel->then(function (Channel $channel) use ($subject, $consumeArgs) {
+        $channel->then(function (Channel $channel) use ($qos) {
+            if (count($qos) === 0) {
+                return $channel;
+            }
+
+            return $channel->qos(...$qos)->then(function () use ($channel) {
+                return $channel;
+            });
+        })->then(function (Channel $channel) use ($subject, $consumeArgs) {
             /** @var string $consumerTag */
             $consumerTag = null;
             $timer = $this->loop->addPeriodicTimer(1, function () use ($channel, $subject, &$timer, &$consumerTag) {

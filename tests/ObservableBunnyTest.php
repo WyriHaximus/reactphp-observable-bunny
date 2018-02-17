@@ -29,6 +29,7 @@ final class ObservableBunnyTest extends TestCase
         $channel = $this->prophesize(Channel::class);
         $channel->close()->shouldBeCalled()->willReturn(resolve(true));
         $channel->cancel('abc')->shouldBeCalled()->willReturn(resolve(true));
+        $channel->qos(0, 10)->shouldBeCalled()->willReturn(resolve(true));
         $channel->consume(
             Argument::that(function ($lambda) use ($message, $channel, $loop) {
                 $loop->futureTick(function () use ($lambda, $message, $channel) {
@@ -50,7 +51,7 @@ final class ObservableBunnyTest extends TestCase
         $bunny->channel()->shouldBeCalled()->willReturn(resolve($channel->reveal()));
 
         $observableBunny = new ObservableBunny($loop, $bunny->reveal());
-        $subject = $observableBunny->consume('queue:name');
+        $subject = $observableBunny->consume('queue:name', [0, 10]);
         /** @var Message $messageDto */
         $messageDto = null;
         $subject->subscribe(function (Message $message) use (&$messageDto, $subject) {

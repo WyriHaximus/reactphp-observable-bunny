@@ -17,8 +17,8 @@ composer require wyrihaximus/react-observable-bunny
 
 # Usage
 
-The following example will connect to RabbitMQ, consume messages from the `queue:name` queue for 
-two minutes before canceling the subscription and disconnect the client.
+The following example will connect to RabbitMQ, consume messages from the `queue:name` queue, with prefetch (QOS) set 
+to 10 for two minutes before canceling the subscription and disconnect the client.
 
 ```php
 <?php
@@ -31,7 +31,7 @@ use WyriHaximus\React\ObservableBunny\ObservableBunny;
 $loop = Factory::create();
 $bunny = new Client($loop);
 $observableBunny = new ObservableBunny($loop, $bunny);
-$queue = $observableBunny->consume('queue:name');
+$queue = $observableBunny->consume('queue:name', [0, 10]);
 $loop->addTimer(120, function () use ($queue, $bunny) {
     $queue->dispose();
     $bunny->disconnect();
