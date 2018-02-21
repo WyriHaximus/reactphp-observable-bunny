@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9c777d2fbb5381b20de3a8eb3ee9157b",
+    "content-hash": "44a7c135aced30f1a73c8b51421fd91f",
     "packages": [
         {
             "name": "bunny/bunny",
@@ -3698,10 +3698,10 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.0"
+        "php": "^7.1"
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.0.9"
+        "php": "7.1.2"
     }
 }

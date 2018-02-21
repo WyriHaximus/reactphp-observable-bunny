@@ -8,17 +8,13 @@ cache:
 ## Build matrix for lowest and highest possible targets
 matrix:
   include:
-    - php: 7.0
+    - php: 7.1
       env:
         - qaExtended=true
-    - php: 7.1
     - php: 7.2
     - php: nightly
       env:
         - dropPlatform=false
-    - php: 7.0
-      env:
-        - dependencies=lowest
     - php: 7.1
       env:
         - dependencies=lowest
@@ -29,9 +25,6 @@ matrix:
       env:
         - dependencies=lowest
         - dropPlatform=false
-    - php: 7.0
-      env:
-        - dependencies=highest
     - php: 7.1
       env:
         - dependencies=highest
