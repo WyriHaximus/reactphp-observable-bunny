@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": "^7.1",
-        "bunny/bunny": "^0.3.0",
+        "bunny/bunny": "^0.4 || ^0.3 || ^0.2",
         "reactivex/rxphp": "^2.0"
     },
     "require-dev": {

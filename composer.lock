@@ -4,26 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "44a7c135aced30f1a73c8b51421fd91f",
+    "content-hash": "097d5b3b5df892063e91003c9aca2179",
     "packages": [
         {
             "name": "bunny/bunny",
-            "version": "v0.3.0",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jakubkulhan/bunny.git",
-                "reference": "d0dec8fbbac4e4edd6cdc892fe14cfa607c386ce"
+                "reference": "d67bb6d6d2fa5d8e802b7be35a1d0389403491e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jakubkulhan/bunny/zipball/d0dec8fbbac4e4edd6cdc892fe14cfa607c386ce",
-                "reference": "d0dec8fbbac4e4edd6cdc892fe14cfa607c386ce",
+                "url": "https://api.github.com/repos/jakubkulhan/bunny/zipball/d67bb6d6d2fa5d8e802b7be35a1d0389403491e5",
+                "reference": "d67bb6d6d2fa5d8e802b7be35a1d0389403491e5",
                 "shasum": ""
             },
             "require": {
                 "php": "~7.0",
                 "psr/log": "~1.0",
-                "react/event-loop": "~0.4",
+                "react/event-loop": "^1.0 || ^0.5 || ^0.4",
                 "react/promise": "~2.2"
             },
             "require-dev": {
@@ -60,7 +60,7 @@
                 "react-php",
                 "reactphp"
             ],
-            "time": "2018-01-28T18:58:53+00:00"
+            "time": "2018-04-07T07:01:13+00:00"
         },
         {
             "name": "psr/log",
