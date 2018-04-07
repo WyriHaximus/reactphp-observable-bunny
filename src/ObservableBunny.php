@@ -7,7 +7,7 @@ use Bunny\Channel;
 use Bunny\Message as BunnyMessage;
 use Bunny\Protocol\MethodBasicConsumeOkFrame;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use React\Promise\PromiseInterface;
 use Rx\Subject\Subject;
 use Throwable;
@@ -106,9 +106,7 @@ final class ObservableBunny
     private function onError(Subject $subject, TimerInterface $timer): callable
     {
         return function (Throwable $et) use ($subject, $timer) {
-            if ($this->loop->isTimerActive($timer)) {
-                $this->loop->cancelTimer($timer);
-            }
+            $this->loop->cancelTimer($timer);
             $subject->onError($et);
         };
     }

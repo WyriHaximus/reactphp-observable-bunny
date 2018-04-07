@@ -19,7 +19,8 @@
     "autoload": {
         "psr-4": {
             "WyriHaximus\\React\\ObservableBunny\\": "src/"
-        }
+        },
+        "files": ["src/compatibility.php"]
     },
     "autoload-dev": {
         "psr-4": {
