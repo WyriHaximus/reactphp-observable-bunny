@@ -25,13 +25,20 @@ final class ObservableBunny
     private $bunny;
 
     /**
+     * @var float
+     */
+    private $checkInterval;
+
+    /**
      * @param LoopInterface $loop
      * @param Client        $bunny
+     * @param float         $checkInterval
      */
-    public function __construct(LoopInterface $loop, Client $bunny)
+    public function __construct(LoopInterface $loop, Client $bunny, float $checkInterval = 1.0)
     {
         $this->loop = $loop;
         $this->bunny = $bunny;
+        $this->checkInterval = $checkInterval;
     }
 
     public function consume(
@@ -59,7 +66,7 @@ final class ObservableBunny
         })->then(function (Channel $channel) use ($subject, $consumeArgs) {
             /** @var string $consumerTag */
             $consumerTag = null;
-            $timer = $this->loop->addPeriodicTimer(1, function () use ($channel, $subject, &$timer, &$consumerTag) {
+            $timer = $this->loop->addPeriodicTimer($this->checkInterval, function () use ($channel, $subject, &$timer, &$consumerTag) {
                 if (!$subject->isDisposed()) {
                     return;
                 }

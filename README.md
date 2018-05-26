@@ -31,6 +31,8 @@ use WyriHaximus\React\ObservableBunny\ObservableBunny;
 $loop = Factory::create();
 $bunny = new Client($loop);
 $observableBunny = new ObservableBunny($loop, $bunny);
+// OR to check the dispose status on another interval then once a second, like twice a second
+$observableBunny = new ObservableBunny($loop, $bunny, 0.5);
 $queue = $observableBunny->consume('queue:name', [0, 10]);
 $loop->addTimer(120, function () use ($queue, $bunny) {
     $queue->dispose();
